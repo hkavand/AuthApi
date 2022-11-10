@@ -1,0 +1,22 @@
+[package]
+name = "AuthApi"
+version = "0.1.0"
+authors = ["Hossein Kavand <github.com/hkavand>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+diesel = { version = "1.4.4", features = ["postgres", "chrono"] }
+dotenv = "0.15.0"
+argonautica = { version = "0.2", features = ["simd"] }
+rand = "0.8.5"
+chrono = { version = "0.4", features = ["serde", "rustc-serialize"] }
+jwt-simple = "0.11.2"
+fancy-regex = "0.10.0"
+phonenumber = "0.3.1+8.12.9"
+
+[dependencies.rocket]
+version = "0.5.0-rc.1"
+features = ["json"]
