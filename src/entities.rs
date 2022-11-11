@@ -1,5 +1,5 @@
 extern crate argonautica;
-use rocket::{serde::{Deserialize, Serialize}, request::{FromRequest, self, Outcome}, http::{Status, Header}};
+use rocket::{serde::{Deserialize, Serialize}, request::{FromRequest, self, Outcome}, http::Header};
 use rocket::response::Responder;
 use crate::utils::*;
 extern crate dotenv;
@@ -23,6 +23,11 @@ pub struct ResponseError {
     pub Error: String
 }
 
+#[derive(Debug, Serialize, Responder)]
+pub struct ResponseOk {
+    pub Msg: String
+}
+
 #[derive(Responder)]
 pub struct MyResponder<T> {
     inner: T,
@@ -37,7 +42,7 @@ impl<'r, 'o: 'r, T: Responder<'r, 'o>> MyResponder<T> {
     }
 }
 
-pub struct Token(String);
+pub struct Token(Option<String>);
 
 #[derive(Debug)]
 pub enum ApiTokenError {
@@ -46,7 +51,7 @@ pub enum ApiTokenError {
 }
 
 impl Token {
-    pub fn get_token (&self) -> String{
+    pub fn get_token (&self) -> Option<String>{
         let Token(token) = self;
         token.to_owned()
     }
@@ -64,11 +69,11 @@ impl<'r> FromRequest<'r> for Token {
                 let real_token = bearer_token[1];
                 
                 match jwt::verify(real_token){
-                    Some(_) => Outcome::Success(Token(real_token.to_string())),
-                    None => Outcome::Failure((Status::Unauthorized, ApiTokenError::Invalid))
+                    Some(_) => Outcome::Success(Token(Some(real_token.to_string()))),
+                    None => Outcome::Success(Token(None))
                 }
             }
-            None => Outcome::Failure((Status::Unauthorized, ApiTokenError::Missing)),
+            None => Outcome::Success(Token(None)),
         }
     }
 }
